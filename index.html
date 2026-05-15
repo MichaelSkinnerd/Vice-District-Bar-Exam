@@ -5,7 +5,6 @@
 <title>Vice District Bar Exam</title>
 
 <style>
-  /* PAGE BACKGROUND */
 body {
   font-family: Arial, sans-serif;
   background: #d8cfc0;
@@ -14,70 +13,68 @@ body {
   padding: 0;
 }
 
-/* TOP HEADER BAR */
-.header {
-  background: linear-gradient(90deg, #162a44, #6b1c1c);
-  color: white;
-  padding: 25px 40px;
-  border-bottom: 5px solid #8b1e1e;
-}
-
-.header h1 {
-  color: #8b1e1e;
-  margin: 0;
-  font-size: 32px;
-}
-
-.header p {
-  margin-top: 5px;
-  opacity: 0.85;
-}
-
-/* MAIN CONTAINER */
 .container {
   max-width: 1200px;
   margin: 20px auto;
   padding: 20px;
 }
 
-/* NOTICE BOX */
+.timer-box {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background: #162a44;
+  color: white;
+  padding: 15px 20px;
+  border-bottom: 5px solid #8b1e1e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#timer {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.warning {
+  color: #ffd166;
+}
+
+.danger {
+  color: #ff4d4d;
+}
+
+h1, h2 {
+  color: #8b1e1e;
+}
+
+h2 {
+  border-bottom: 2px solid #8b1e1e;
+  padding-bottom: 5px;
+}
+
 .notice {
   background: #f4ede3;
   border-left: 6px solid #8b1e1e;
   padding: 15px 20px;
   border-radius: 8px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* SECTION TITLES */
-h1 {
-  color: #8b1e1e;
-  
-}
-h2 {
-  color: #8b1e1e;
-  border-bottom: 2px solid #8b1e1e;
-  padding-bottom: 5px;
-}
-
-/* QUESTION GRID */
 #questions {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 15px;
 }
 
-/* QUESTION CARD */
 .question {
   background: #f4ede3;
   border-radius: 10px;
   border: 1px solid #d2c6b4;
   overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-/* QUESTION TITLE */
 .question p {
   margin: 0;
   padding: 12px;
@@ -86,7 +83,6 @@ h2 {
   color: #5a1414;
 }
 
-/* ANSWERS */
 .question label {
   display: block;
   padding: 10px 12px;
@@ -98,31 +94,29 @@ h2 {
   background: #e8ddcc;
 }
 
-/* RADIO BUTTON */
 input[type="radio"] {
   margin-right: 8px;
   accent-color: #8b1e1e;
 }
 
-/* TEXT INPUT */
 input[type="text"] {
   width: 100%;
   padding: 12px;
   border-radius: 8px;
   border: 1px solid #cbbfae;
   background: #f4ede3;
+  box-sizing: border-box;
 }
 
-/* BUTTONS */
 button {
   padding: 12px 18px;
   border-radius: 8px;
   border: none;
   font-weight: bold;
   cursor: pointer;
+  margin-top: 15px;
 }
 
-/* SUBMIT BUTTON */
 button[type="submit"] {
   background: #8b1e1e;
   color: white;
@@ -132,17 +126,16 @@ button[type="submit"]:hover {
   background: #6e1717;
 }
 
-/* COPY BUTTON */
 #copyBtn {
   background: #f4ede3;
   border: 1px solid #cbbfae;
+  margin-left: 8px;
 }
 
 #copyBtn:hover {
   background: #e8ddcc;
 }
 
-/* RESULTS BOX */
 #scoreBox {
   margin-top: 20px;
   padding: 15px;
@@ -152,23 +145,6 @@ button[type="submit"]:hover {
   display: none;
 }
 
-/* RESULTS GRID (Score / Percent / Status / Time) */
-#scoreBox h2 {
-  margin-top: 0;
-}
-
-.result-grid {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-}
-
-.result-item {
-  text-align: center;
-  flex: 1;
-}
-
-/* PASSED / FAILED COLORS */
 .passed {
   color: green;
   font-weight: bold;
@@ -179,7 +155,6 @@ button[type="submit"]:hover {
   font-weight: bold;
 }
 
-/* DISCORD BOX */
 #discordResult {
   width: 100%;
   height: 150px;
@@ -190,29 +165,55 @@ button[type="submit"]:hover {
   padding: 10px;
   display: none;
 }
+
+@media (max-width: 900px) {
+  #questions {
+    grid-template-columns: 1fr;
+  }
+
+  .timer-box {
+    flex-direction: column;
+    gap: 5px;
+    text-align: center;
+  }
+}
 </style>
 </head>
 
 <body>
 
+<div class="timer-box">
+  <div><strong>Vice District Bar Exam</strong></div>
+  <div>Time Elapsed: <span id="timer">00:00</span></div>
+  <div>Time Limit: 06:00</div>
+</div>
+
 <div class="container">
   <h1>Vice District Bar Exam</h1>
   <p>Passing Score: 80%</p>
+
+  <div class="notice">
+    You must score at least 80% and finish under 6 minutes. 
+    If your time reaches 6 minutes or more, you automatically fail.
+  </div>
 
   <form onsubmit="return submitQuiz();">
 
     <h2>Applicant Info</h2>
 
     <div class="question">
-      <label>Character Name:</label>
-      <input type="text" id="characterName" required>
+      <p>Character Name</p>
+      <label>
+        <input type="text" id="characterName" required>
+      </label>
     </div>
 
     <h2>Questions</h2>
 
     <div id="questions"></div>
 
-    <button type="submit">Submit Answers</button>
+    <button type="submit" id="submitBtn">Submit Answers</button>
+
     <button type="button" id="copyBtn" onclick="copyResults()" style="display:none;">
       Copy Character Name & Results
     </button>
@@ -328,7 +329,10 @@ const questions = [
   }
 ];
 
+const TIME_LIMIT_MS = 360000;
 const startTime = Date.now();
+let timerInterval;
+let submitted = false;
 
 function loadQuestions() {
   const box = document.getElementById("questions");
@@ -355,13 +359,36 @@ function formatTime(ms) {
   const totalSeconds = Math.floor(ms / 1000);
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
-  return `${minutes} minute(s) ${seconds} second(s)`;
+
+  return String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+}
+
+function updateTimer() {
+  if (submitted) return;
+
+  const elapsedMs = Date.now() - startTime;
+  const timer = document.getElementById("timer");
+
+  timer.textContent = formatTime(elapsedMs);
+
+  if (elapsedMs >= 300000 && elapsedMs < TIME_LIMIT_MS) {
+    timer.className = "warning";
+  }
+
+  if (elapsedMs >= TIME_LIMIT_MS) {
+    timer.className = "danger";
+  }
 }
 
 function submitQuiz() {
+  submitted = true;
+  clearInterval(timerInterval);
+
   let score = 0;
   const characterName = document.getElementById("characterName").value;
-  const timeTaken = formatTime(Date.now() - startTime);
+
+  const elapsedMs = Date.now() - startTime;
+  const timeTaken = formatTime(elapsedMs);
 
   questions.forEach((item, index) => {
     const selected = document.querySelector(`input[name="Q${index + 1}"]:checked`);
@@ -371,14 +398,21 @@ function submitQuiz() {
   });
 
   const percent = Math.round((score / questions.length) * 100);
-  const status = percent >= 80 ? "PASSED" : "FAILED";
+
+  let status = percent >= 80 ? "PASSED" : "FAILED";
+
+  if (elapsedMs >= TIME_LIMIT_MS) {
+    status = "FAILED - TIME LIMIT EXCEEDED";
+  }
+
+  const statusClass = status.includes("PASSED") ? "passed" : "failed";
 
   document.getElementById("scoreBox").style.display = "block";
   document.getElementById("scoreBox").innerHTML = `
     <h2>Results</h2>
     <p><strong>Character:</strong> ${characterName}</p>
     <p><strong>Score:</strong> ${score}/${questions.length} - ${percent}%</p>
-    <p><strong>Status:</strong> ${status}</p>
+    <p><strong>Status:</strong> <span class="${statusClass}">${status}</span></p>
     <p><strong>Time Taken:</strong> ${timeTaken}</p>
   `;
 
@@ -393,7 +427,11 @@ function submitQuiz() {
 **Status:** ${status}
 **Time Taken:** ${timeTaken}
 
-**Result:** ${status === "PASSED" ? "✅ Licensed Attorney Eligible" : "❌ Retake Required"}
+**Result:** ${
+  status.includes("FAILED")
+    ? "❌ Retake Required"
+    : "✅ Licensed Attorney Eligible"
+}
 
 **━━━━━━━━━━━━━━━━━━━━**`;
 
@@ -407,8 +445,6 @@ function submitQuiz() {
 
 function copyResults() {
   const resultBox = document.getElementById("discordResult");
-  resultBox.select();
-  resultBox.setSelectionRange(0, 99999);
 
   navigator.clipboard.writeText(resultBox.value).then(() => {
     alert("Results copied! Paste it into Discord.");
@@ -416,6 +452,8 @@ function copyResults() {
 }
 
 loadQuestions();
+timerInterval = setInterval(updateTimer, 1000);
+updateTimer();
 </script>
 
 </body>
