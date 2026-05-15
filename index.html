@@ -226,6 +226,7 @@ button[type="submit"]:hover {
 </div>
 
 <script>
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1504977885591506985/PsxXP0JFgFY904ME-K7WfHkgx768p7pCwIOTVEd2R2ESOhDCxEWOEERmWOQaaWg2wgI6";
 const questions = [
   {
     q: "1. What is a Terry Stop?",
@@ -401,12 +402,14 @@ function submitQuiz() {
 
   let status = percent >= 80 ? "PASSED" : "FAILED";
 
+  // ⛔ TIME LIMIT FAIL
   if (elapsedMs >= TIME_LIMIT_MS) {
     status = "FAILED - TIME LIMIT EXCEEDED";
   }
 
   const statusClass = status.includes("PASSED") ? "passed" : "failed";
 
+  // 🧾 SHOW RESULTS ON PAGE
   document.getElementById("scoreBox").style.display = "block";
   document.getElementById("scoreBox").innerHTML = `
     <h2>Results</h2>
@@ -416,6 +419,7 @@ function submitQuiz() {
     <p><strong>Time Taken:</strong> ${timeTaken}</p>
   `;
 
+  // 📋 DISCORD COPY TEXT
   const discordText =
 `**━━━━━━━━━━━━━━━━━━━━**
 **⚖️ VICE DISTRICT BAR EXAM RESULTS**
@@ -439,6 +443,30 @@ function submitQuiz() {
   document.getElementById("discordResult").value = discordText;
 
   document.getElementById("copyBtn").style.display = "inline-block";
+
+  // 🔥 SEND RESULTS TO DISCORD (WEBHOOK)
+  fetch(WEBHOOK_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      embeds: [{
+        title: "⚖️ Vice District Bar Exam Result",
+        color: status.includes("PASSED") ? 3066993 : 15158332,
+        fields: [
+          { name: "Character", value: characterName, inline: true },
+          { name: "Score", value: `${score}/${questions.length} (${percent}%)`, inline: true },
+          { name: "Status", value: status, inline: true },
+          { name: "Time Taken", value: timeTaken, inline: true }
+        ],
+        footer: {
+          text: "Vice District RP"
+        },
+        timestamp: new Date().toISOString()
+      }]
+    })
+  }).catch(err => console.error("Webhook error:", err));
 
   return false;
 }
