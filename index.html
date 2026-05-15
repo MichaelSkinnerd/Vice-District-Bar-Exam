@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vice District Bar Exam</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: #eee;
+    padding: 20px;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: auto;
+    background: #1b1b1b;
+    padding: 25px;
+    border-radius: 10px;
+  }
+
+  h1, h2 {
+    color: #ff4fd8;
+  }
+
+  .question {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #252525;
+    border-left: 4px solid #00e5ff;
+    border-radius: 6px;
+  }
+
+  label {
+    display: block;
+    margin: 8px 0;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+  }
+
+  button {
+    background: #ff4fd8;
+    color: white;
+    border: none;
+    padding: 14px 22px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 5px;
+  }
+
+  button:hover {
+    background: #d936b8;
+  }
+
+  #scoreBox {
+    margin-top: 20px;
+    padding: 15px;
+    background: #003b46;
+    border-radius: 6px;
+    display: none;
+  }
+
+  #discordResult {
+    width: 100%;
+    height: 220px;
+    margin-top: 15px;
+    display: none;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Vice District Bar Exam</h1>
+  <p>Passing Score: 80%</p>
+
+  <form onsubmit="return submitQuiz();">
+
+    <h2>Applicant Info</h2>
+
+    <div class="question">
+      <label>Character Name:</label>
+      <input type="text" id="characterName" required>
+    </div>
+
+    <h2>Questions</h2>
+
+    <div id="questions"></div>
+
+    <button type="submit">Submit Answers</button>
+    <button type="button" id="copyBtn" onclick="copyResults()" style="display:none;">
+      Copy Character Name & Results
+    </button>
+
+    <div id="scoreBox"></div>
+
+    <textarea id="discordResult" readonly></textarea>
+
+  </form>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "1. What is a Terry Stop?",
+    a: ["A. A full arrest with charges", "B. A temporary detention based on reasonable suspicion", "C. A search warrant", "D. A traffic citation"],
+    correct: "B"
+  },
+  {
+    q: "2. Which is required for an arrest?",
+    a: ["A. Reasonable suspicion", "B. Probable cause", "C. A warrant in all cases", "D. Officer intuition"],
+    correct: "B"
+  },
+  {
+    q: "3. What does probable cause mean?",
+    a: ["A. A guess", "B. A reasonable belief a crime occurred", "C. A confession is required", "D. Evidence beyond doubt"],
+    correct: "B"
+  },
+  {
+    q: "4. If a suspect invokes their right to remain silent, officers must:",
+    a: ["A. Continue questioning", "B. Threaten arrest", "C. Stop questioning", "D. Ignore it"],
+    correct: "C"
+  },
+  {
+    q: "5. What is the purpose of Miranda Rights?",
+    a: ["A. To charge a suspect", "B. To inform suspects of their rights", "C. To search property", "D. To issue fines"],
+    correct: "B"
+  },
+  {
+    q: "6. What is considered an illegal search?",
+    a: ["A. Search with consent", "B. Search with a warrant", "C. Search without probable cause or consent", "D. Inventory search while arrested."],
+    correct: "C"
+  },
+  {
+    q: "7. What is burden of proof in court?",
+    a: ["A. Defendant proves innocence", "B. Police decide guilt", "C. Prosecution must prove guilt", "D. Judge investigates"],
+    correct: "C"
+  },
+  {
+    q: "8. What does beyond a reasonable doubt mean?",
+    a: ["A. 100% certainty", "B. Strong evidence with no logical doubt", "C. Any suspicion", "D. Majority vote"],
+    correct: "B"
+  },
+  {
+    q: "9. What is hearsay?",
+    a: ["A. Direct evidence", "B. Second-hand information", "C. Physical evidence", "D. Video proof"],
+    correct: "B"
+  },
+  {
+    q: "10. What is attorney-client privilege?",
+    a: ["A. Lawyer reports everything", "B. Lawyer can share info publicly", "C. Communication is confidential", "D. Only applies in court"],
+    correct: "C"
+  },
+  {
+    q: "11. Leaving a known drug area alone justifies a stop?",
+    a: ["A. Yes always", "B. No, not by itself", "C. Only at night", "D. Only with a warrant"],
+    correct: "B"
+  },
+  {
+    q: "12. No Miranda rights were read before a confession. What happens?",
+    a: ["A. Always admissible", "B. Likely suppressed", "C. Automatically guilty", "D. Only used in civil court"],
+    correct: "B"
+  },
+  {
+    q: "13. Illegal search finds weapons. What happens?",
+    a: ["A. Evidence always allowed", "B. Evidence likely suppressed", "C. Charges double", "D. Officer decides"],
+    correct: "B"
+  },
+  {
+    q: "14. A witness only “heard it happened.” This is:",
+    a: ["A. Strong evidence", "B. Direct evidence", "C. Hearsay", "D. Physical proof"],
+    correct: "C"
+  },
+  {
+    q: "15. A suspect runs from a lawful stop. What does this allow?",
+    a: ["A. Nothing changes", "B. Escalation is justified", "C. Case dismissed", "D. Must release suspect"],
+    correct: "B"
+  },
+  {
+    q: "16. Which is a felony?",
+    a: ["A. Parking ticket", "B. Murder", "C. Jaywalking", "D. Speeding"],
+    correct: "B"
+  },
+  {
+    q: "17. Reasonable suspicion allows:",
+    a: ["A. Arrest", "B. Temporary detention", "C. Conviction", "D. Jail time"],
+    correct: "B"
+  },
+  {
+    q: "18. Which is NOT a suspect right?",
+    a: ["A. Right to remain silent", "B. Right to attorney", "C. Right to resist arrest", "D. Protection from unlawful search"],
+    correct: "C"
+  },
+  {
+    q: "19. A defense attorney’s role is to:",
+    a: ["A. Prove guilt", "B. Protect client rights", "C. Work for police", "D. Decide sentencing"],
+    correct: "B"
+  },
+  {
+    q: "20. Police misconduct should be handled by:",
+    a: ["A. Ignoring it", "B. Filing motions and challenging evidence", "C. Helping police", "D. Ending the case immediately"],
+    correct: "B"
+  }
+];
+
+const startTime = Date.now();
+
+function loadQuestions() {
+  const box = document.getElementById("questions");
+
+  questions.forEach((item, index) => {
+    let html = `<div class="question"><p>${item.q}</p>`;
+
+    item.a.forEach(answer => {
+      const letter = answer.charAt(0);
+      html += `
+        <label>
+          <input type="radio" name="Q${index + 1}" value="${letter}" required>
+          ${answer}
+        </label>
+      `;
+    });
+
+    html += `</div>`;
+    box.innerHTML += html;
+  });
+}
+
+function formatTime(ms) {
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes} minute(s) ${seconds} second(s)`;
+}
+
+function submitQuiz() {
+  let score = 0;
+  const characterName = document.getElementById("characterName").value;
+  const timeTaken = formatTime(Date.now() - startTime);
+
+  questions.forEach((item, index) => {
+    const selected = document.querySelector(`input[name="Q${index + 1}"]:checked`);
+    if (selected && selected.value === item.correct) {
+      score++;
+    }
+  });
+
+  const percent = Math.round((score / questions.length) * 100);
+  const status = percent >= 80 ? "PASSED" : "FAILED";
+
+  document.getElementById("scoreBox").style.display = "block";
+  document.getElementById("scoreBox").innerHTML = `
+    <h2>Results</h2>
+    <p><strong>Character:</strong> ${characterName}</p>
+    <p><strong>Score:</strong> ${score}/${questions.length} - ${percent}%</p>
+    <p><strong>Status:</strong> ${status}</p>
+    <p><strong>Time Taken:</strong> ${timeTaken}</p>
+  `;
+
+  const discordText =
+`**━━━━━━━━━━━━━━━━━━━━**
+**⚖️ VICE DISTRICT BAR EXAM RESULTS**
+**━━━━━━━━━━━━━━━━━━━━**
+
+**Character Name:** ${characterName}
+**Score:** ${score}/${questions.length}
+**Percentage:** ${percent}%
+**Status:** ${status}
+**Time Taken:** ${timeTaken}
+
+**Result:** ${status === "PASSED" ? "✅ Licensed Attorney Eligible" : "❌ Retake Required"}
+
+**━━━━━━━━━━━━━━━━━━━━**`;
+
+  document.getElementById("discordResult").style.display = "block";
+  document.getElementById("discordResult").value = discordText;
+
+  document.getElementById("copyBtn").style.display = "inline-block";
+
+  return false;
+}
+
+function copyResults() {
+  const resultBox = document.getElementById("discordResult");
+  resultBox.select();
+  resultBox.setSelectionRange(0, 99999);
+
+  navigator.clipboard.writeText(resultBox.value).then(() => {
+    alert("Results copied! Paste it into Discord.");
+  });
+}
+
+loadQuestions();
+</script>
+
+</body>
+</html>
